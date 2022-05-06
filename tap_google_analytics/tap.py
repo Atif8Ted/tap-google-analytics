@@ -101,6 +101,7 @@ class TapGoogleAnalytics(Tap):
                 return ServiceAccountCredentials.from_json_keyfile_name(
                     self.config["key_file_location"], SCOPES
                 )
+                print(self.config["key_file_location"])
 
             elif self.config.get("client_secrets"):
                 return ServiceAccountCredentials.from_json_keyfile_dict(

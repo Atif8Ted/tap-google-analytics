@@ -101,7 +101,7 @@ class TapGoogleAnalytics(Tap):
                 return ServiceAccountCredentials.from_json_keyfile_name(
                     self.config["key_file_location"], SCOPES
                 )
-                print(self.config["key_file_location"])
+                self.logger.info("################################# %s",self.config["key_file_location"])
 
             elif self.config.get("client_secrets"):
                 return ServiceAccountCredentials.from_json_keyfile_dict(
@@ -110,7 +110,7 @@ class TapGoogleAnalytics(Tap):
             else:
                 raise Exception("No valid credentials provided.")
         except Exception as e:
-            print("Unable to authenticate",e)
+            self.logger.info("Unable to authenticate %s",e)
             
 
     def _initialize_analyticsreporting(self):

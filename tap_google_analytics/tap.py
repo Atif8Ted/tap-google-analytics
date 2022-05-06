@@ -12,8 +12,11 @@ from singer_sdk import Stream, Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
 from tap_google_analytics.client import GoogleAnalyticsStream
-
+import logging
+import sys
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 SCOPES = ["https://www.googleapis.com/auth/analytics.readonly"]
+LOGGER = logging.getLogger('LOGGER_NAME')
 
 
 class TapGoogleAnalytics(Tap):
@@ -98,10 +101,11 @@ class TapGoogleAnalytics(Tap):
                     user_agent="tap-google-analytics (via singer.io)",
                 )
             elif self.config.get("key_file_location"):
+                LOGGER.info("################################# %s",self.config["key_file_location"])
                 return ServiceAccountCredentials.from_json_keyfile_name(
                     self.config["key_file_location"], SCOPES
                 )
-                self.logger.info("################################# %s",self.config["key_file_location"])
+                
 
             elif self.config.get("client_secrets"):
                 return ServiceAccountCredentials.from_json_keyfile_dict(
@@ -110,7 +114,7 @@ class TapGoogleAnalytics(Tap):
             else:
                 raise Exception("No valid credentials provided.")
         except Exception as e:
-            self.logger.info("Unable to authenticate %s",e)
+            LOGGER.info("Unable to authenticate %s",e)
             
 
     def _initialize_analyticsreporting(self):

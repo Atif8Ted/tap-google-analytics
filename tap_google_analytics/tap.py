@@ -86,26 +86,31 @@ class TapGoogleAnalytics(Tap):
     ).to_dict()
 
     def _initialize_credentials(self):
-        if self.config.get("oauth_credentials"):
-            return GoogleCredentials(
-                access_token=self.config["oauth_credentials"]["access_token"],
-                refresh_token=self.config["oauth_credentials"]["refresh_token"],
-                client_id=self.config["oauth_credentials"]["client_id"],
-                client_secret=self.config["oauth_credentials"]["client_secret"],
-                token_expiry=None,  # let the library refresh the token if it is expired
-                token_uri="https://accounts.google.com/o/oauth2/token",
-                user_agent="tap-google-analytics (via singer.io)",
-            )
-        elif self.config.get("key_file_location"):
-            return ServiceAccountCredentials.from_json_keyfile_name(
-                self.config["key_file_location"], SCOPES
-            )
-        elif self.config.get("client_secrets"):
-            return ServiceAccountCredentials.from_json_keyfile_dict(
-                self.config["client_secrets"], SCOPES
-            )
-        else:
-            raise Exception("No valid credentials provided.")
+        try:
+            if self.config.get("oauth_credentials"):
+                return GoogleCredentials(
+                    access_token=self.config["oauth_credentials"]["access_token"],
+                    refresh_token=self.config["oauth_credentials"]["refresh_token"],
+                    client_id=self.config["oauth_credentials"]["client_id"],
+                    client_secret=self.config["oauth_credentials"]["client_secret"],
+                    token_expiry=None,  # let the library refresh the token if it is expired
+                    token_uri="https://accounts.google.com/o/oauth2/token",
+                    user_agent="tap-google-analytics (via singer.io)",
+                )
+            elif self.config.get("key_file_location"):
+                return ServiceAccountCredentials.from_json_keyfile_name(
+                    self.config["key_file_location"], SCOPES
+                )
+
+            elif self.config.get("client_secrets"):
+                return ServiceAccountCredentials.from_json_keyfile_dict(
+                    self.config["client_secrets"], SCOPES
+                )
+            else:
+                raise Exception("No valid credentials provided.")
+        except Exception as e:
+            print("Unable to authenticate",e)
+            
 
     def _initialize_analyticsreporting(self):
         """Initialize an Analytics Reporting API V4 service object.
